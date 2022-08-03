@@ -69,10 +69,11 @@ resource "coder_agent" "main" {
   arch           = var.step2_arch
   os             = "linux"
   startup_script = <<EOF
-    #!/bin/sh
+    #!/bin/bash
     code-server --install-extension MS-CEINTL.vscode-language-pack-zh-hans
     nohup code-server --auth none --port 13337 &
-    git clone ${GIT_REPO}
+    git clone ${var.git_repo}
+    echo "${var.git_repo}" | awk -F '/' '{print $NF }' | xargs cd
     jupyter lab --ServerApp.base_url=/@${data.coder_workspace.me.owner}/${data.coder_workspace.me.name}/apps/jupyter/ --ServerApp.token='' --ip='*'
     EOF
 

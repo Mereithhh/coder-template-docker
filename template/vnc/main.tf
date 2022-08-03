@@ -46,6 +46,12 @@ variable "step3_OS" {
   }
   sensitive = true
 }
+variable "git_repo" {
+  description = "Which Repo would you like to load wfor your workspace?"
+  # The codercom/enterprise-* images are only built for amd64
+  default = ""
+}
+
 
 # https://ppswi.us/noVNC/app/images/icons/novnc-192x192.png
 
@@ -82,6 +88,8 @@ resource "coder_agent" "dev" {
   os             = "linux"
   startup_script = <<EOT
 #!/bin/bash
+git clone ${var.git_repo}
+echo "${var.git_repo}" | awk -F '/' '{print $NF }' | xargs cd
 code-server --install-extension MS-CEINTL.vscode-language-pack-zh-hans
 set -euo pipefail
 # start code-server

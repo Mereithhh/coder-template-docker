@@ -67,6 +67,11 @@ variable "docker_image" {
 
 }
 
+variable "git_repo" {
+  description = "Which Repo would you like to load wfor your workspace?"
+  # The codercom/enterprise-* images are only built for amd64
+  default = ""
+}
 provider "docker" {
   host = var.step3_OS == "Windows" ? "npipe:////.//pipe//docker_engine" : "unix:///var/run/docker.sock"
 }
@@ -81,10 +86,11 @@ resource "coder_agent" "main" {
   arch           = var.step2_arch
   os             = "linux"
   startup_script = <<EOF
-    #!/bin/sh
+    #!/bin/bash
     code-server --install-extension MS-CEINTL.vscode-language-pack-zh-hans
+    git clone ${var.git_repo}
+    echo "${var.git_repo}" | awk -F '/' '{print $NF }' | xargs cd
     code-server --auth none --port 13337
-    git clone ${GIT_REPO}
     EOF
 
   # These environment variables allow you to make Git commits right away after creating a
@@ -107,13 +113,6 @@ resource "coder_app" "code-server" {
   icon     = "/icon/code.svg"
 }
 
-
-
-variable "git_repo" {
-  description = "Which Repo would you like to load wfor your workspace?"
-  # The codercom/enterprise-* images are only built for amd64
-  default = ""
-}
 
 resource "docker_volume" "home_volume" {
   name = "coder-${data.coder_workspace.me.owner}-${data.coder_workspace.me.name}-home"
