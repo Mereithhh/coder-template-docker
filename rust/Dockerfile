@@ -21,7 +21,8 @@ USER root
 # 换源改时区之类的
 RUN sed -i s@/archive.ubuntu.com/@/mirrors.tuna.tsinghua.edu.cn/@g /etc/apt/sources.list && \
   sed -i s@/security.ubuntu.com/@/mirrors.tuna.tsinghua.edu.cn/@g /etc/apt/sources.list && \
-  apt-get update && apt-get install -y  curl vim tmux net-tools  libssl-dev build-essential
+  apt-get update && apt-get install -y  curl vim tmux net-tools  libssl-dev build-essential && \
+  apt-get autoclean && rm -rf /var/lib/apt/lists/*
 # 安装 zsh
 # RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.2/zsh-in-docker.sh)"
 

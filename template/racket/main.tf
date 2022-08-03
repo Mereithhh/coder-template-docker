@@ -55,6 +55,22 @@ variable "step3_OS" {
   sensitive = true
 }
 
+variable "docker_image" {
+  description = "Which Docker image would you like to use for your workspace?"
+  default = "registry.cn-beijing.aliyuncs.com/mereith/coder-base"
+  validation {
+    condition = contains(["registry.cn-beijing.aliyuncs.com/mereith/coder-base"], var.docker_image)
+    error_message = "Invalid Docker image!"
+  }
+  sensitive = true
+
+}
+
+variable "git_repo" {
+  description = "Which Repo would you like to load wfor your workspace?"
+  # The codercom/enterprise-* images are only built for amd64
+  default = ""
+}
 provider "docker" {
   host = var.step3_OS == "Windows" ? "npipe:////.//pipe//docker_engine" : "unix:///var/run/docker.sock"
 }
@@ -69,10 +85,12 @@ resource "coder_agent" "main" {
   arch           = var.step2_arch
   os             = "linux"
   startup_script = <<EOF
+    #!/bin/bash
+    code-server --install-extension MS-CEINTL.vscode-language-pack-zh-hans
     git clone ${var.git_repo}
     echo "${var.git_repo}" | awk -F '/' '{print $NF }' | xargs cd
-    pip3 install jupyterlab
-    jupyter lab --ServerApp.base_url='/@${data.coder_workspace.me.owner}/${data.coder_workspace.me.name}/apps/jupyter/' --ServerApp.token='' --ip='*'
+    wget https://download.racket-lang.org/installers/8.5/racket-8.5-x86_64-linux-cs.sh
+    code-server --auth none --port 13337
     EOF
 
   # These environment variables allow you to make Git commits right away after creating a
@@ -87,28 +105,14 @@ resource "coder_agent" "main" {
     GIT_REPO = "${var.git_repo}"
   }
 }
-resource "coder_app" "jupyter" {
+
+resource "coder_app" "code-server" {
   agent_id = coder_agent.main.id
-  url = "http://localhost:8888/@${data.coder_workspace.me.owner}/${data.coder_workspace.me.name}/apps/jupyter"
-  icon = "/icon/jupyter.svg"
+  name     = "code-server"
+  url      = "http://localhost:13337/?folder=/home/coder"
+  icon     = "/icon/code.svg"
 }
 
-
-variable "docker_image" {
-  description = "Which Docker image would you like to use for your workspace?"
-  # The codercom/enterprise-* images are only built for amd64
-  default = "registry.cn-beijing.aliyuncs.com/mereith/coder-jupyter"
-  validation {
-    condition = contains(["registry.cn-beijing.aliyuncs.com/mereith/coder-base", "registry.cn-beijing.aliyuncs.com/mereith/coder-jupyter"], var.docker_image)
-    error_message = "Invalid Docker image!"
-  }
-  sensitive = true
-}
-variable "git_repo" {
-  description = "Which Repo would you like to load wfor your workspace?"
-  # The codercom/enterprise-* images are only built for amd64
-  default = ""
-}
 
 resource "docker_volume" "home_volume" {
   name = "coder-${data.coder_workspace.me.owner}-${data.coder_workspace.me.name}-home"
