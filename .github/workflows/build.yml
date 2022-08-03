@@ -68,6 +68,16 @@ jobs:
           tags: |
             mereith/coder-python
             registry.cn-beijing.aliyuncs.com/mereith/coder-python
+      - name: 构建 jupyter 镜像
+        uses: docker/build-push-action@v2
+        with:
+          context: ./jupyter
+          file: ./jupyter/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            mereith/coder-jupyter
+            registry.cn-beijing.aliyuncs.com/mereith/coder-jupyter
       - name: 构建 rust 镜像
         uses: docker/build-push-action@v2
         with:

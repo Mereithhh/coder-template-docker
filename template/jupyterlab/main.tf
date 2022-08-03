@@ -69,12 +69,10 @@ resource "coder_agent" "main" {
   arch           = var.step2_arch
   os             = "linux"
   startup_script = <<EOF
-    #!/bin/bash
-    code-server --install-extension MS-CEINTL.vscode-language-pack-zh-hans
-    nohup code-server --auth none --port 13337 &
     git clone ${var.git_repo}
     echo "${var.git_repo}" | awk -F '/' '{print $NF }' | xargs cd
-    jupyter lab --ServerApp.base_url=/@${data.coder_workspace.me.owner}/${data.coder_workspace.me.name}/apps/jupyter/ --ServerApp.token='' --ip='*'
+    pip3 install jupyterlab
+    jupyter lab --ServerApp.base_url='/@${data.coder_workspace.me.owner}/${data.coder_workspace.me.name}/apps/jupyter/' --ServerApp.token='' --ip='*'
     EOF
 
   # These environment variables allow you to make Git commits right away after creating a
@@ -90,15 +88,9 @@ resource "coder_agent" "main" {
   }
 }
 resource "coder_app" "jupyter" {
-  agent_id = coder_agent.coder.id
+  agent_id = coder_agent.main.id
   url = "http://localhost:8888/@${data.coder_workspace.me.owner}/${data.coder_workspace.me.name}/apps/jupyter"
   icon = "/icon/jupyter.svg"
-}
-resource "coder_app" "code-server" {
-  agent_id = coder_agent.main.id
-  name     = "code-server"
-  url      = "http://localhost:13337/?folder=/home/coder"
-  icon     = "/icon/code.svg"
 }
 
 
