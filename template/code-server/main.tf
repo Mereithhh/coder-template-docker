@@ -55,6 +55,18 @@ variable "step3_OS" {
   sensitive = true
 }
 
+variable "docker_image" {
+  description = "Which Docker image would you like to use for your workspace?"
+  validation {
+    condition = contains(["registry.cn-beijing.aliyuncs.com/mereith/coder-base", "registry.cn-beijing.aliyuncs.com/mereith/coder-node",
+    "registry.cn-beijing.aliyuncs.com/mereith/coder-go", "registry.cn-beijing.aliyuncs.com/mereith/coder-rust",
+    "registry.cn-beijing.aliyuncs.com/mereith/coder-java", "registry.cn-beijing.aliyuncs.com/mereith/coder-python"], var.docker_image)
+    error_message = "Invalid Docker image!"
+  }
+  sensitive = true
+
+}
+
 provider "docker" {
   host = var.step3_OS == "Windows" ? "npipe:////.//pipe//docker_engine" : "unix:///var/run/docker.sock"
 }
@@ -70,8 +82,9 @@ resource "coder_agent" "main" {
   os             = "linux"
   startup_script = <<EOF
     #!/bin/sh
+    code-server --install-extension MS-CEINTL.vscode-language-pack-zh-hans
     code-server --auth none --port 13337
-    git clone ${var.git_repo}
+    git clone ${GIT_REPO}
     EOF
 
   # These environment variables allow you to make Git commits right away after creating a
@@ -83,6 +96,7 @@ resource "coder_agent" "main" {
     GIT_COMMITTER_NAME = "${data.coder_workspace.me.owner}"
     GIT_AUTHOR_EMAIL = "${data.coder_workspace.me.owner_email}"
     GIT_COMMITTER_EMAIL = "${data.coder_workspace.me.owner_email}"
+    GIT_REPO = "${var.git_repo}"
   }
 }
 
@@ -94,19 +108,7 @@ resource "coder_app" "code-server" {
 }
 
 
-variable "docker_image" {
-  description = "Which Docker image would you like to use for your workspace?"
-  # The codercom/enterprise-* images are only built for amd64
-  default = "registry.cn-beijing.aliyuncs.com/mereith/coder-base"
-  validation {
-    condition = contains(["registry.cn-beijing.aliyuncs.com/mereith/coder-base", "registry.cn-beijing.aliyuncs.com/mereith/coder-node",
-    "registry.cn-beijing.aliyuncs.com/mereith/coder-go", "registry.cn-beijing.aliyuncs.com/mereith/coder-rust",
-    "registry.cn-beijing.aliyuncs.com/mereith/coder-java", "registry.cn-beijing.aliyuncs.com/mereith/coder-python"], var.docker_image)
-    error_message = "Invalid Docker image!"
-  }
-  sensitive = true
 
-}
 variable "git_repo" {
   description = "Which Repo would you like to load wfor your workspace?"
   # The codercom/enterprise-* images are only built for amd64

@@ -82,6 +82,7 @@ resource "coder_agent" "dev" {
   os             = "linux"
   startup_script = <<EOT
 #!/bin/bash
+code-server --install-extension MS-CEINTL.vscode-language-pack-zh-hans
 set -euo pipefail
 # start code-server
 code-server --auth none --port 13337 &
@@ -94,6 +95,13 @@ cp /etc/zsh/newuser.zshrc.recommended $HOME/.zshrc
 echo "Initializing Supervisor..."
 nohup supervisord
   EOT
+  env = {
+    GIT_AUTHOR_NAME = "${data.coder_workspace.me.owner}"
+    GIT_COMMITTER_NAME = "${data.coder_workspace.me.owner}"
+    GIT_AUTHOR_EMAIL = "${data.coder_workspace.me.owner_email}"
+    GIT_COMMITTER_EMAIL = "${data.coder_workspace.me.owner_email}"
+    GIT_REPO = "${var.git_repo}"
+  }
 }
 
 variable "docker_image" {

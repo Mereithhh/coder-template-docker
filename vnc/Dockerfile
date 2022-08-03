@@ -10,7 +10,6 @@ RUN code-server --install-extension ms-azuretools.vscode-docker && \
   code-server --install-extension  oderwat.indent-rainbow && \
   code-server --install-extension  eamodio.gitlens    && \
   code-server --install-extension bierner.markdown-preview-github-styles && \
-  code-server --install-extension MS-CEINTL.vscode-language-pack-zh-hans && \
   code-server --install-extension formulahendry.code-runner && \
   code-server --install-extension streetsidesoftware.code-spell-checker && \
   code-server --install-extension tamasfe.even-better-toml && \

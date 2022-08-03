@@ -70,8 +70,9 @@ resource "coder_agent" "main" {
   os             = "linux"
   startup_script = <<EOF
     #!/bin/sh
+    code-server --install-extension MS-CEINTL.vscode-language-pack-zh-hans
     nohup code-server --auth none --port 13337 &
-    git clone ${var.git_repo}
+    git clone ${GIT_REPO}
     jupyter lab --ServerApp.base_url=/@${data.coder_workspace.me.owner}/${data.coder_workspace.me.name}/apps/jupyter/ --ServerApp.token='' --ip='*'
     EOF
 
@@ -84,6 +85,7 @@ resource "coder_agent" "main" {
     GIT_COMMITTER_NAME = "${data.coder_workspace.me.owner}"
     GIT_AUTHOR_EMAIL = "${data.coder_workspace.me.owner_email}"
     GIT_COMMITTER_EMAIL = "${data.coder_workspace.me.owner_email}"
+    GIT_REPO = "${var.git_repo}"
   }
 }
 resource "coder_app" "jupyter" {
