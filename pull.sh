@@ -9,8 +9,6 @@ NAME="node"
 docker pull registry.cn-beijing.aliyuncs.com/mereith/coder-${NAME}
 NAME="python"
 docker pull registry.cn-beijing.aliyuncs.com/mereith/coder-${NAME}
-NAME="jupyter"
-docker pull registry.cn-beijing.aliyuncs.com/mereith/coder-${NAME}
 NAME="rust"
 docker pull registry.cn-beijing.aliyuncs.com/mereith/coder-${NAME}
 NAME="vnc"

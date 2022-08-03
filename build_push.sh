@@ -19,10 +19,6 @@ NAME="python"
 cd python && docker build -t registry.cn-beijing.aliyuncs.com/mereith/coder-${NAME} .
 docker push registry.cn-beijing.aliyuncs.com/mereith/coder-${NAME}
 cd ..
-NAME="jupyter"
-cd jupyter && docker build -t registry.cn-beijing.aliyuncs.com/mereith/coder-${NAME} .
-docker push registry.cn-beijing.aliyuncs.com/mereith/coder-${NAME}
-cd ..
 NAME="rust"
 cd rust && docker build -t registry.cn-beijing.aliyuncs.com/mereith/coder-${NAME} .
 docker push registry.cn-beijing.aliyuncs.com/mereith/coder-${NAME}

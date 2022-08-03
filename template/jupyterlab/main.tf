@@ -69,6 +69,8 @@ resource "coder_agent" "main" {
   arch           = var.step2_arch
   os             = "linux"
   startup_script = <<EOF
+    code-server --install-extension MS-CEINTL.vscode-language-pack-zh-hans
+    nohup code-server --auth none --port 13337 &
     git clone ${var.git_repo}
     echo "${var.git_repo}" | awk -F '/' '{print $NF }' | xargs cd
     pip3 install jupyterlab
@@ -97,7 +99,7 @@ resource "coder_app" "jupyter" {
 variable "docker_image" {
   description = "Which Docker image would you like to use for your workspace?"
   # The codercom/enterprise-* images are only built for amd64
-  default = "registry.cn-beijing.aliyuncs.com/mereith/coder-jupyter"
+  default = "registry.cn-beijing.aliyuncs.com/mereith/coder-base"
   validation {
     condition = contains(["registry.cn-beijing.aliyuncs.com/mereith/coder-base", "registry.cn-beijing.aliyuncs.com/mereith/coder-jupyter"], var.docker_image)
     error_message = "Invalid Docker image!"
